@@ -7,7 +7,7 @@ const client: RedisClient = redis.createClient({
     port: Number(process.env.REDIS_PORT) || 6379,
 });
 
-// Promisify the `get` method for easier async/await usage
+
 const getAsync = util.promisify(client.get).bind(client);
 
 export const cacheMiddleware = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
@@ -21,16 +21,16 @@ export const cacheMiddleware = async (req: Request, res: Response, next: NextFun
             return;
         }
 
-        // Overwrite the `res.send` method to cache the response data
+       
         const originalSend = res.send.bind(res);
         res.send = (body: any) => {
-            client.setex(key, 600, JSON.stringify(body)); // Cache for 10 minutes
+            client.setex(key, 600, JSON.stringify(body)); 
             originalSend(body);
         };
 
         next();
     } catch (error) {
         console.error('Redis error:', error);
-        next(); // Proceed even if Redis fails to avoid blocking the request
+        next(); 
     }
 };
